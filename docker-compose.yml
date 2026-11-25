@@ -1,0 +1,13 @@
+services:
+  popcat-triam-udom:
+    build: .
+    container_name: popcat-triam-udom
+    restart: unless-stopped
+    ports:
+      - "${HOST_PORT:-8080}:8080"
+    environment:
+      - PORT=8080
+      - DB_PATH=/app/data/popcat.db
+      - MAX_POPS_PER_BATCH=${MAX_POPS_PER_BATCH:-100}
+    volumes:
+      - ./data:/app/data

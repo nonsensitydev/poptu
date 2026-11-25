@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>POPCAT เตรียมอุดมศึกษา</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700;800&family=Nunito:wght@800;900&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #bdaa90;
+      font-family: 'Nunito', 'Kanit', system-ui, -apple-system, sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+
+    .stage {
+      position: relative;
+      width: 100%;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding-top: clamp(54px, 7vh, 76px);
+      padding-bottom: 64px;
+      cursor: pointer;
+    }
+
+    /* Top Controls */
+    .top-bar {
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      right: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 30;
+      pointer-events: none;
+    }
+
+    .top-btn {
+      pointer-events: auto;
+      background: #ffffff;
+      color: #1f2328;
+      border: 2px solid #000000;
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-family: 'Kanit', 'Nunito', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 3px 0 #000000;
+      transition: transform 60ms ease, box-shadow 60ms ease;
+    }
+
+    .top-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #000000;
+    }
+
+    .mute-btn {
+      padding: 8px 11px;
+    }
+
+    /* Classic Popcat Outlined Typography */
+    .popcat-title {
+      margin: 0;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 900;
+      font-size: clamp(3.1rem, 8.5vw, 5.4rem);
+      line-height: 0.95;
+      letter-spacing: 0.04em;
+      color: #ffffff;
+      -webkit-text-stroke: 3.5px #000000;
+      text-shadow:
+        3px 3px 0 #000000,
+        -3px -3px 0 #000000,
+        3px -3px 0 #000000,
+        -3px 3px 0 #000000,
+        0 5px 0 #000000;
+      pointer-events: none;
+    }
+
+    .popcat-counter {
+      margin-top: 6px;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 900;
+      font-size: clamp(2.4rem, 6.5vw, 4.1rem);
+      line-height: 1.05;
+      color: #ffffff;
+      -webkit-text-stroke: 3px #000000;
+      text-shadow:
+        2.5px 2.5px 0 #000000,
+        -2.5px -2.5px 0 #000000,
+        2.5px -2.5px 0 #000000,
+        -2.5px 2.5px 0 #000000,
+        0 4px 0 #000000;
+      transition: transform 65ms cubic-bezier(0.22, 1, 0.36, 1);
+      pointer-events: none;
+    }
+
+    .building-subscore {
+      margin-top: 4px;
+      font-family: 'Kanit', sans-serif;
+      font-weight: 700;
+      font-size: clamp(0.95rem, 2.3vw, 1.15rem);
+      color: #ffffff;
+      -webkit-text-stroke: 1px #000000;
+      text-shadow:
+        1.5px 1.5px 0 #000000,
+        -1.5px -1.5px 0 #000000,
+        1.5px -1.5px 0 #000000,
+        -1.5px 1.5px 0 #000000;
+      pointer-events: none;
+    }
+
+    /* Center Phra Kiao Emblem */
+    .emblem-wrap {
+      flex: 1;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 16px 18px;
+      pointer-events: none;
+    }
+
+    .phra-kiao-img {
+      max-height: 52vh;
+      max-width: 78vw;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      -webkit-user-drag: none;
+      transform: scale(1) translateY(0);
+      transition: transform 55ms cubic-bezier(0.22, 1, 0.36, 1), filter 55ms ease-out;
+      will-change: transform, filter;
+    }
+
+    .phra-kiao-img.is-popped {
+      transform: scale(1.09) translateY(-10px);
+      filter: drop-shadow(0 0 18px rgba(255, 215, 64, 0.72));
+    }
+
+    /* Bottom Leaderboard Bar & Drawer */
+    .leaderboard-bar {
+      position: fixed;
+      left: 50%;
+      bottom: 0;
+      transform: translateX(-50%);
+      width: min(560px, 96vw);
+      background: #ffffff;
+      border: 2px solid #000000;
+      border-bottom: none;
+      border-radius: 14px 14px 0 0;
+      z-index: 40;
+      box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.14);
+      font-family: 'Kanit', 'Nunito', sans-serif;
+    }
+
+    .lb-header {
+      width: 100%;
+      background: #ffffff;
+      border: none;
+      border-radius: 12px 12px 0 0;
+      padding: 11px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      color: #111111;
+    }
+
+    .lb-header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .lb-rank-pill {
+      background: #f5b821;
+      color: #000000;
+      border: 1.5px solid #000000;
+      border-radius: 6px;
+      padding: 1px 7px;
+      font-size: 13px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .lb-header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .lb-chevron {
+      display: inline-block;
+      transition: transform 180ms ease;
+    }
+
+    .leaderboard-bar.is-open .lb-chevron {
+      transform: rotate(180deg);
+    }
+
+    .lb-drawer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 240ms cubic-bezier(0.22, 1, 0.36, 1);
+      border-top: 0 solid #e5e7eb;
+    }
+
+    .leaderboard-bar.is-open .lb-drawer {
+      max-height: 62vh;
+      overflow-y: auto;
+      border-top-width: 1.5px;
+    }
+
+    .lb-summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 16px;
+      background: #f8f9fa;
+      border-bottom: 1px solid #e5e7eb;
+      font-size: 13px;
+      font-weight: 600;
+      color: #4b5563;
+    }
+
+    .lb-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .lb-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      border-bottom: 1px solid #f1f3f5;
+      font-size: 15px;
+      gap: 10px;
+    }
+
+    .lb-row.is-mine {
+      background: #fffbeb;
+      font-weight: 700;
+    }
+
+    .lb-row-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .lb-pos {
+      width: 28px;
+      text-align: center;
+      font-weight: 800;
+      color: #374151;
+      flex-shrink: 0;
+    }
+
+    .lb-name {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: #111827;
+    }
+
+    .lb-row-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .lb-pps {
+      font-size: 12px;
+      font-weight: 700;
+      color: #15803d;
+      background: #dcfce7;
+      padding: 2px 7px;
+      border-radius: 999px;
+    }
+
+    .lb-score {
+      font-weight: 800;
+      color: #111827;
+    }
+
+    /* Startup Building Selection Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.58);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 60;
+    }
+
+    .modal-backdrop.is-hidden {
+      display: none;
+    }
+
+    .modal-card {
+      width: min(460px, 100%);
+      max-height: 86dvh;
+      background: #ffffff;
+      border: 2.5px solid #000000;
+      border-radius: 16px;
+      box-shadow: 0 8px 0 #000000;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      font-family: 'Kanit', 'Nunito', sans-serif;
+    }
+
+    .modal-head {
+      padding: 16px 18px 12px;
+      border-bottom: 1.5px solid #e5e7eb;
+      text-align: center;
+    }
+
+    .modal-title {
+      margin: 0;
+      font-size: 21px;
+      font-weight: 800;
+      color: #111827;
+    }
+
+    .modal-subtitle {
+      margin: 4px 0 0;
+      font-size: 14px;
+      color: #4b5563;
+    }
+
+    .modal-grid {
+      padding: 12px 16px 16px;
+      overflow-y: auto;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .bldg-option {
+      width: 100%;
+      background: #ffffff;
+      border: 2px solid #111827;
+      border-radius: 10px;
+      padding: 11px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 700;
+      color: #111827;
+      text-align: left;
+      transition: background 100ms ease, transform 60ms ease;
+    }
+
+    .bldg-option:hover {
+      background: #f9fafb;
+    }
+
+    .bldg-option:active {
+      transform: scale(0.99);
+    }
+
+    .bldg-option.is-selected {
+      background: #fef3c7;
+      border-color: #000000;
+    }
+
+    .bldg-option-score {
+      font-size: 14px;
+      font-weight: 700;
+      color: #4b5563;
+      font-variant-numeric: tabular-nums;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+  <!-- Top Controls -->
+  <div class="top-bar">
+    <button type="button" id="muteBtn" class="top-btn mute-btn" aria-label="เปิด/ปิดเสียง">
+      <span id="muteIcon">🔊</span>
+    </button>
+    <button type="button" id="changeBuildingBtn" class="top-btn">
+      <span id="selectedBuildingLabel">เลือกตึกเรียน</span>
+      <span>· เปลี่ยนตึก</span>
+    </button>
+  </div>
+
+  <!-- Main Popcat Stage -->
+  <main id="popStage" class="stage" role="button" tabindex="0" aria-label="กดเพื่อเพิ่มคะแนนตึกเรียน">
+    <h1 class="popcat-title">POPCAT</h1>
+    <div id="myCounter" class="popcat-counter">0</div>
+    <div id="buildingSubscore" class="building-subscore">เลือกตึกเรียนเพื่อเริ่มสะสมคะแนน</div>
+
+    <div class="emblem-wrap">
+      <img
+        id="phraKiaoImg"
+        class="phra-kiao-img"
+        src="/static/phra-kiao.png"
+        alt="ตราพระเกี้ยว โรงเรียนเตรียมอุดมศึกษา"
+        draggable="false"
+      />
+    </div>
+  </main>
+
+  <!-- Bottom Leaderboard Bar & Expandable Drawer -->
+  <aside id="leaderboardBar" class="leaderboard-bar" aria-label="ตารางอันดับคะแนนตึกเรียน">
+    <button type="button" id="lbToggleBtn" class="lb-header" aria-expanded="false">
+      <div class="lb-header-left">
+        <span id="topRankBadge" class="lb-rank-pill">#1</span>
+        <span id="topBuildingSummary">กำลังโหลดคะแนน...</span>
+      </div>
+      <div class="lb-header-right">
+        <span id="topBuildingScore">0</span>
+        <span class="lb-chevron">▲</span>
+      </div>
+    </button>
+
+    <div id="lbDrawer" class="lb-drawer">
+      <div class="lb-summary">
+        <span>คะแนนรวมทั้งโรงเรียน</span>
+        <span id="schoolTotalScore">0</span>
+      </div>
+      <ul id="lbList" class="lb-list"></ul>
+    </div>
+  </aside>
+
+  <!-- Startup Building Selection Modal -->
+  <div id="buildingModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 id="modalTitle" class="modal-title">เลือกตึกเรียนของคุณ</h2>
+        <p class="modal-subtitle">ทุกการกดจะถูกส่งเข้าคะแนนรวมของตึกนั้นแบบเรียลไทม์</p>
+      </div>
+      <div id="buildingGrid" class="modal-grid"></div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_BUILDING_KEY = "tu_popcat_selected_building_v1";
+    const STORAGE_MY_POPS_KEY = "tu_popcat_my_pops_v1";
+    const STORAGE_MUTED_KEY = "tu_popcat_muted_v1";
+
+    const DEFAULT_BUILDINGS = [
+      { id: "bldg-1", name: "ตึก 1", shortName: "ตึก 1", score: 0, pps: 0 },
+      { id: "bldg-2", name: "ตึก 2", shortName: "ตึก 2", score: 0, pps: 0 },
+      { id: "bldg-3", name: "ตึก 3", shortName: "ตึก 3", score: 0, pps: 0 },
+      { id: "bldg-4", name: "ตึก 4", shortName: "ตึก 4", score: 0, pps: 0 },
+      { id: "bldg-8", name: "ตึก 8", shortName: "ตึก 8", score: 0, pps: 0 },
+      { id: "bldg-9", name: "ตึก 9", shortName: "ตึก 9", score: 0, pps: 0 },
+      { id: "bldg-50", name: "ตึก 50 ปี", shortName: "ตึก 50 ปี", score: 0, pps: 0 },
+      { id: "bldg-55", name: "ตึก 55 ปี", shortName: "ตึก 55 ปี", score: 0, pps: 0 },
+      { id: "bldg-60", name: "ตึก 60 ปี", shortName: "ตึก 60 ปี", score: 0, pps: 0 },
+      { id: "bldg-khunying", name: "ตึกคุณหญิงหรั่ง กันตารัติ", shortName: "ตึกคุณหญิงหรั่งฯ", score: 0, pps: 0 },
+      { id: "bldg-art", name: "ตึกศิลปะ", shortName: "ตึกศิลปะ", score: 0, pps: 0 }
+    ];
+
+    const state = {
+      selectedBuildingId: localStorage.getItem(STORAGE_BUILDING_KEY) || null,
+      myPops: Math.max(0, parseInt(localStorage.getItem(STORAGE_MY_POPS_KEY) || "0", 10) || 0),
+      isMuted: localStorage.getItem(STORAGE_MUTED_KEY) === "1",
+      isDrawerOpen: false,
+      isModalOpen: false,
+      tiltSign: -1,
+      activePointers: new Set(),
+      activeKeys: new Set(),
+      buildings: DEFAULT_BUILDINGS.map((b) => ({ ...b })),
+      totalPops: 0,
+      pendingByBuilding: {},
+      isFlushing: false
+    };
+
+    const dom = {
+      stage: document.getElementById("popStage"),
+      myCounter: document.getElementById("myCounter"),
+      buildingSubscore: document.getElementById("buildingSubscore"),
+      phraKiaoImg: document.getElementById("phraKiaoImg"),
+      muteBtn: document.getElementById("muteBtn"),
+      muteIcon: document.getElementById("muteIcon"),
+      changeBuildingBtn: document.getElementById("changeBuildingBtn"),
+      selectedBuildingLabel: document.getElementById("selectedBuildingLabel"),
+      leaderboardBar: document.getElementById("leaderboardBar"),
+      lbToggleBtn: document.getElementById("lbToggleBtn"),
+      topRankBadge: document.getElementById("topRankBadge"),
+      topBuildingSummary: document.getElementById("topBuildingSummary"),
+      topBuildingScore: document.getElementById("topBuildingScore"),
+      schoolTotalScore: document.getElementById("schoolTotalScore"),
+      lbList: document.getElementById("lbList"),
+      buildingModal: document.getElementById("buildingModal"),
+      buildingGrid: document.getElementById("buildingGrid")
+    };
+
+    function formatNumber(n) {
+      return Math.floor(Number(n) || 0).toLocaleString("en-US");
+    }
+
+    function getBuildingById(id) {
+      return state.buildings.find((b) => b.id === id) || null;
+    }
+
+    function getEffectiveBuildingScore(b) {
+      const pending = state.pendingByBuilding[b.id] || 0;
+      return (b.score || 0) + pending;
+    }
+
+    function getSortedBuildings() {
+      return [...state.buildings]
+        .map((b) => ({
+          ...b,
+          effectiveScore: getEffectiveBuildingScore(b)
+        }))
+        .sort((a, b) => b.effectiveScore - a.effectiveScore);
+    }
+
+    /* Synthesized Web Audio Pop Sound */
+    let audioCtx = null;
+    function playPopSound() {
+      if (state.isMuted) return;
+      try {
+        if (!audioCtx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (!AudioContextClass) return;
+          audioCtx = new AudioContextClass();
+        }
+        if (audioCtx.state === "suspended") {
+          audioCtx.resume();
+        }
+
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        const pitchJitter = 0.94 + Math.random() * 0.14;
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(340 * pitchJitter, now);
+        osc.frequency.exponentialRampToValueAtTime(920 * pitchJitter, now + 0.042);
+
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.linearRampToValueAtTime(0.28, now + 0.006);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.065);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.07);
+      } catch (_) {}
+    }
+
+    function renderUI() {
+      dom.muteIcon.textContent = state.isMuted ? "🔇" : "🔊";
+      dom.myCounter.textContent = formatNumber(state.myPops);
+
+      const sorted = getSortedBuildings();
+      const selected = state.selectedBuildingId ? getBuildingById(state.selectedBuildingId) : null;
+
+      if (selected) {
+        const rankIndex = sorted.findIndex((b) => b.id === selected.id);
+        const effScore = getEffectiveBuildingScore(selected);
+        dom.selectedBuildingLabel.textContent = selected.shortName;
+        dom.buildingSubscore.textContent = `${selected.name} · ${formatNumber(effScore)} คะแนน (อันดับ #${rankIndex + 1})`;
+      } else {
+        dom.selectedBuildingLabel.textContent = "เลือกตึกเรียน";
+        dom.buildingSubscore.textContent = "เลือกตึกเรียนเพื่อเริ่มสะสมคะแนน";
+      }
+
+      // Top bar summary
+      const leader = sorted[0];
+      if (leader) {
+        if (selected && selected.id !== leader.id) {
+          const myRank = sorted.findIndex((b) => b.id === selected.id) + 1;
+          const myEff = getEffectiveBuildingScore(selected);
+          dom.topRankBadge.textContent = `#${myRank}`;
+          dom.topBuildingSummary.textContent = `${selected.shortName} (นำ: ${leader.shortName})`;
+          dom.topBuildingScore.textContent = formatNumber(myEff);
+        } else {
+          dom.topRankBadge.textContent = "#1";
+          dom.topBuildingSummary.textContent = leader.name;
+          dom.topBuildingScore.textContent = formatNumber(leader.effectiveScore);
+        }
+      }
+
+      const totalPending = Object.values(state.pendingByBuilding).reduce((acc, v) => acc + v, 0);
+      const totalServer = state.buildings.reduce((acc, b) => acc + (b.score || 0), 0);
+      dom.schoolTotalScore.textContent = formatNumber(totalServer + totalPending);
+
+      // Drawer rows
+      dom.lbList.innerHTML = sorted
+        .map((b, idx) => {
+          const isMine = b.id === state.selectedBuildingId;
+          const rankLabel = idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : `${idx + 1}`;
+          const ppsBadge = b.pps > 0 ? `<span class="lb-pps">+${b.pps}/s</span>` : "";
+          return `
+            <li class="lb-row ${isMine ? "is-mine" : ""}">
+              <div class="lb-row-left">
+                <span class="lb-pos">${rankLabel}</span>
+                <span class="lb-name">${b.name}${isMine ? " (ตึกของคุณ)" : ""}</span>
+              </div>
+              <div class="lb-row-right">
+                ${ppsBadge}
+                <span class="lb-score">${formatNumber(b.effectiveScore)}</span>
+              </div>
+            </li>
+          `;
+        })
+        .join("");
+
+      // Modal grid
+      if (state.isModalOpen) {
+        dom.buildingGrid.innerHTML = sorted
+          .map((b) => {
+            const isSelected = b.id === state.selectedBuildingId;
+            return `
+              <button type="button" class="bldg-option ${isSelected ? "is-selected" : ""}" data-bldg-id="${b.id}">
+                <span>${b.name}</span>
+                <span class="bldg-option-score">${formatNumber(b.effectiveScore)} คะแนน</span>
+              </button>
+            `;
+          })
+          .join("");
+      }
+    }
+
+    function openModal() {
+      state.isModalOpen = true;
+      dom.buildingModal.classList.remove("is-hidden");
+      renderUI();
+    }
+
+    function closeModal() {
+      if (!state.selectedBuildingId) return;
+      state.isModalOpen = false;
+      dom.buildingModal.classList.add("is-hidden");
+      renderUI();
+    }
+
+    function selectBuilding(buildingId) {
+      state.selectedBuildingId = buildingId;
+      localStorage.setItem(STORAGE_BUILDING_KEY, buildingId);
+      closeModal();
+    }
+
+    function setEmblemPopped(popped) {
+      if (popped) {
+        dom.phraKiaoImg.classList.add("is-popped");
+      } else {
+        dom.phraKiaoImg.classList.remove("is-popped");
+      }
+    }
+
+    function triggerPop() {
+      if (!state.selectedBuildingId) {
+        openModal();
+        return;
+      }
+
+      state.myPops += 1;
+      localStorage.setItem(STORAGE_MY_POPS_KEY, String(state.myPops));
+
+      const bid = state.selectedBuildingId;
+      state.pendingByBuilding[bid] = (state.pendingByBuilding[bid] || 0) + 1;
+
+      state.tiltSign *= -1;
+      const deg = state.tiltSign * 4;
+      dom.myCounter.style.transform = `scale(1.12) rotate(${deg}deg)`;
+      clearTimeout(triggerPop._tiltTimer);
+      triggerPop._tiltTimer = setTimeout(() => {
+        dom.myCounter.style.transform = "scale(1) rotate(0deg)";
+      }, 95);
+
+      playPopSound();
+      renderUI();
+    }
+
+    /* Flush batched pops to self-hosted backend */
+    async function flushPendingPops() {
+      if (state.isFlushing) return;
+      const entries = Object.entries(state.pendingByBuilding).filter(([, count]) => count > 0);
+      if (entries.length === 0) return;
+
+      state.isFlushing = true;
+      try {
+        for (const [buildingId, count] of entries) {
+          state.pendingByBuilding[buildingId] -= count;
+          try {
+            const res = await fetch("/api/pop", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ building_id: buildingId, count })
+            });
+            if (!res.ok) {
+              state.pendingByBuilding[buildingId] = (state.pendingByBuilding[buildingId] || 0) + count;
+            }
+          } catch (_) {
+            state.pendingByBuilding[buildingId] = (state.pendingByBuilding[buildingId] || 0) + count;
+          }
+        }
+      } finally {
+        state.isFlushing = false;
+      }
+    }
+
+    function flushWithBeacon() {
+      const entries = Object.entries(state.pendingByBuilding).filter(([, count]) => count > 0);
+      for (const [buildingId, count] of entries) {
+        const blob = new Blob(
+          [JSON.stringify({ building_id: buildingId, count })],
+          { type: "application/json" }
+        );
+        if (navigator.sendBeacon && navigator.sendBeacon("/api/pop", blob)) {
+          state.pendingByBuilding[buildingId] -= count;
+        }
+      }
+    }
+
+    function applyServerSnapshot(snapshot) {
+      if (!snapshot || !Array.isArray(snapshot.buildings)) return;
+      const incomingMap = new Map(snapshot.buildings.map((b) => [b.id, b]));
+      state.buildings = state.buildings.map((existing) => {
+        const fresh = incomingMap.get(existing.id);
+        return fresh ? { ...existing, ...fresh } : existing;
+      });
+      state.totalPops = snapshot.total_pops || 0;
+      renderUI();
+    }
+
+    async function fetchScoresOnce() {
+      try {
+        const res = await fetch("/api/scores", { cache: "no-store" });
+        if (res.ok) {
+          const data = await res.json();
+          applyServerSnapshot(data);
+        }
+      } catch (_) {}
+    }
+
+    function connectRealtimeStream() {
+      if (!window.EventSource) {
+        setInterval(fetchScoresOnce, 2000);
+        return;
+      }
+
+      const es = new EventSource("/api/stream");
+      es.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          applyServerSnapshot(data);
+        } catch (_) {}
+      };
+      es.onerror = () => {
+        es.close();
+        setTimeout(connectRealtimeStream, 2500);
+      };
+    }
+
+    /* Event Listeners */
+    dom.stage.addEventListener("pointerdown", (e) => {
+      if (e.button !== undefined && e.button !== 0 && e.pointerType === "mouse") return;
+      if (state.isModalOpen) return;
+      state.activePointers.add(e.pointerId);
+      setEmblemPopped(true);
+      triggerPop();
+    });
+
+    function releasePointer(e) {
+      state.activePointers.delete(e.pointerId);
+      if (state.activePointers.size === 0 && state.activeKeys.size === 0) {
+        setEmblemPopped(false);
+      }
+    }
+
+    window.addEventListener("pointerup", releasePointer);
+    window.addEventListener("pointercancel", releasePointer);
+
+    window.addEventListener("keydown", (e) => {
+      if (state.isModalOpen) return;
+      if (e.repeat) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const ignored = ["Tab", "Escape", "F5", "F11", "F12"];
+      if (ignored.includes(e.key)) return;
+      state.activeKeys.add(e.code);
+      setEmblemPopped(true);
+      triggerPop();
+    });
+
+    window.addEventListener("keyup", (e) => {
+      state.activeKeys.delete(e.code);
+      if (state.activePointers.size === 0 && state.activeKeys.size === 0) {
+        setEmblemPopped(false);
+      }
+    });
+
+    dom.muteBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      state.isMuted = !state.isMuted;
+      localStorage.setItem(STORAGE_MUTED_KEY, state.isMuted ? "1" : "0");
+      renderUI();
+    });
+
+    dom.changeBuildingBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      openModal();
+    });
+
+    dom.buildingGrid.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-bldg-id]");
+      if (!btn) return;
+      selectBuilding(btn.getAttribute("data-bldg-id"));
+    });
+
+    dom.buildingModal.addEventListener("click", (e) => {
+      if (e.target === dom.buildingModal && state.selectedBuildingId) {
+        closeModal();
+      }
+    });
+
+    dom.lbToggleBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      state.isDrawerOpen = !state.isDrawerOpen;
+      dom.leaderboardBar.classList.toggle("is-open", state.isDrawerOpen);
+      dom.lbToggleBtn.setAttribute("aria-expanded", String(state.isDrawerOpen));
+    });
+
+    window.addEventListener("pagehide", flushWithBeacon);
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") {
+        flushWithBeacon();
+      }
+    });
+
+    /* Init */
+    setInterval(flushPendingPops, 500);
+    setInterval(fetchScoresOnce, 10000);
+    fetchScoresOnce();
+    connectRealtimeStream();
+
+    if (!state.selectedBuildingId || !getBuildingById(state.selectedBuildingId)) {
+      state.selectedBuildingId = null;
+      openModal();
+    } else {
+      renderUI();
+    }
+  </script>
+</body>
+</html>
